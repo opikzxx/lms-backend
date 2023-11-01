@@ -51,7 +51,7 @@ class User(AbstractUser):
     email = models.CharField(max_length=128, unique=True, null=False)
     username = models.CharField(max_length=128, null=False)
     city = models.CharField(max_length=50, null=True)
-    province = models.CharField(max_length=15, null=True)
+    province = models.CharField(max_length=30, null=True)
     birth_date = models.DateField(default=datetime.date.today, null=False)
     gender = models.CharField(
         max_length=1,
@@ -110,7 +110,7 @@ class CompanyAccount(models.Model):
 class PersonalAccount(models.Model):
     id = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, null=False)
     occupancy = models.CharField(max_length=32, null=True)
-    occupancy_info = models.CharField(max_length=64, blank=True)
+    # occupancy_info = models.CharField(max_length=64, blank=True)
     interest = models.CharField(max_length=32, null=True)
     motivation = models.TextField(null=True)
 
