@@ -9,13 +9,12 @@ class RegisterSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=128)
     birth_date = serializers.DateField()
     city = serializers.CharField(max_length=50)
-    province = serializers.CharField(max_length=15)
+    province = serializers.CharField(max_length=30)
     gender = serializers.CharField(max_length=1)
     phone_number = serializers.CharField(max_length=15)
     account_type = serializers.CharField(max_length=2)
     
     occupancy = serializers.CharField(max_length=32, required=False)
-    occupancy_info = serializers.CharField(max_length=64, required=False)
     interest = serializers.CharField(max_length=32, required=False)
     motivation = serializers.CharField(required=False)
 
