@@ -95,11 +95,16 @@ ASGI_APPLICATION = 'core.asgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASS'),
-        'HOST': os.environ.get('DB_HOST'),
-        'PORT': os.environ.get('DB_PORT'),
+        'NAME': os.environ.get('DB_NAME_REMOTE'),
+        'USER': os.environ.get('DB_USER_REMOTE'),
+        'PASSWORD': os.environ.get('DB_PASS_REMOTE'),
+        'HOST': os.environ.get('DB_HOST_REMOTE'),
+        'PORT': os.environ.get('DB_PORT_REMOTE'),
+        "OPTIONS": {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            'charset': 'utf8mb4',
+            "autocommit": True,
+        }
     }
 }
 
