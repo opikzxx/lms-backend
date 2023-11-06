@@ -16,8 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-admin.site.site_header = 'Eureka Xpert CCS'
-admin.site.site_title = 'Eureka Xpert CCS'
+admin.site.site_header = 'Eureka Xpert CMS'
+admin.site.site_title = 'Eureka Xpert CMS'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
