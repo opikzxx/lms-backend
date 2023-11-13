@@ -23,7 +23,7 @@ admin.site.site_header = 'Eureka Xpert CMS'
 admin.site.site_title = 'Eureka Xpert CMS'
 
 urlpatterns = [
-    path('', admin.site.urls),
+    path('admin', admin.site.urls),
     path('api/user/', include("authentication.urls")),
     path('api/courses/', include('course.urls_api')),
 ]
