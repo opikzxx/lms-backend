@@ -31,7 +31,7 @@ class LogoutSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "username", "email", "profile_picture"]
+        fields = ["id", "username", "email", "profile_picture", "account_type"]
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
