@@ -110,7 +110,6 @@ class CompanyAccount(models.Model):
 class PersonalAccount(models.Model):
     id = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, null=False)
     occupancy = models.CharField(max_length=32, null=True)
-    # occupancy_info = models.CharField(max_length=64, blank=True)
     interest = models.CharField(max_length=32, null=True)
     motivation = models.TextField(null=True)
 
@@ -133,7 +132,7 @@ class ResetPassword(models.Model):
         verbose_name_plural = 'Reset Passwords'
 
 class BlacklistedToken(models.Model):
-    token = models.CharField(max_length=255, unique=True)
+    token = models.TextField()
     blacklisted_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

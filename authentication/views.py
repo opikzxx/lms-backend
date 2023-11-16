@@ -19,7 +19,7 @@ def register(request, data):
     if not (User.objects.filter(email=data["email"]).exists()):
         user.save()
         if (data["account_type"] == "PR"):
-            personal_account = PersonalAccount(id=user, occupancy=data["occupancy"], occupancy_info=data["occupancy_info"], interest=data["interest"], motivation=data["motivation"])
+            personal_account = PersonalAccount(id=user, occupancy=data["occupancy"], interest=data["interest"], motivation=data["motivation"])
             personal_account.save()
         else:
             company_account = CompanyAccount(id=user, name=data["company_name"], address=data["company_address"])
