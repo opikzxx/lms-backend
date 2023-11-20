@@ -17,7 +17,7 @@ class CourseOverviewModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model= Course
-        fields= ["id","name","description","image_url","status","courseprice", ]
+        fields= ["id","name","description","image_url","status","courseprice", "participant_amount", "certified_participant_amount"]
 
     def get_status(self, obj):
         return obj.get_status_display()
@@ -27,7 +27,7 @@ class ProgramModelSerializer(serializers.ModelSerializer):
         model= Program
         fields= ["id","name"]
 
-class TeacherApiSerializer(serializers.ModelSerializer):
+class TeacherModelSerializer(serializers.ModelSerializer):
     class Meta:
         model= Teacher
         fields= ["id","name","occupation", "experience", "profileImageUrl", "companyImageUrl", "linkedinUrl"]
@@ -71,3 +71,6 @@ class TestimonyModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Testimony
         fields = ["name", "occupation", "desciption", "image_url"]
+
+class IDSerializer(serializers.Serializer):
+    id = serializers.UUIDField()

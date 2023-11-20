@@ -31,18 +31,18 @@ class CourseFaqInline(admin.TabularInline):
 
 class CourseDetailInline(admin.TabularInline):
     model = CourseDetail
+    exclude = ["certificate_image_url"]
 
 class CourseAdmin(admin.ModelAdmin):
     inlines = [
         CourseDetailInline,
-        CourseStudyMethodInline, 
         CourseScheduleInline, 
         CourseCurriculumInline, 
         CourseBatchInline,
         CourseFaqInline,
         CoursePriceInline,
         ]
-    exclude = ['id','created_at','updated_at', 'image_url']
+    exclude = ['id','created_at','updated_at', 'image_url', 'difficulty', 'duration', 'status', 'teacher']
 
 class CourseContentAdmin(admin.ModelAdmin):
     exclude = ['id','created_at','updated_at']
@@ -76,7 +76,7 @@ class TestimonyAdmin(admin.ModelAdmin):
 
 admin.site.register(Teacher, TeacherAdmin)
 admin.site.register(Course, CourseAdmin)
-admin.site.register(CourseContent, CourseContentAdmin)
+# admin.site.register(CourseContent, CourseContentAdmin)
 admin.site.register(Program, ProgramAdmin)
 # admin.site.register(CourseDetail, CourseDetailAdmin)
 # admin.site.register(CoursePrice, CoursePriceAdmin)

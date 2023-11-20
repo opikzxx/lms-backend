@@ -1,14 +1,12 @@
 from django.contrib import admin
 from django.urls import path, include
-from .views_api import ListTeacherApiView, ListCourseApiView, ListContentApiView, ListDetailTeacherApiView, ListDetailCourseApiView, ListDetailContentApiView, ListCoursePriceApiView, ListCourseFaqApiView, ListCourseCurriculumApiView, ListCourseStudyMethodApiView, ListCourseBatchApiView, ListCourseScheduleApiView, ListTestimonyApiView
+from .views_api import *
 
 urlpatterns = [
     path('', ListCourseApiView.as_view(), name='ListCourseApiView'),
     path('teachers', ListTeacherApiView.as_view(), name='ListTeacherApiView'),
-    path('teacher-list/<int:id>', ListDetailTeacherApiView.as_view(), name='ListDetailTeacherApiView'),
-    path('course-list/<int:id>', ListDetailCourseApiView.as_view(), name='ListDetailCourseApiView'),
-    path('content-list', ListContentApiView.as_view(), name='ListContentApiView'),
-    path('content-list/<int:id>', ListDetailContentApiView.as_view(), name='ListDetailContentApiView'),
+    path('teacher/<str:id>', ListDetailTeacherApiView.as_view(), name='ListDetailTeacherApiView'),
+    path('<str:id>', ListDetailCourseApiView.as_view(), name='ListDetailCourseApiView'),
     path('prices/<str:id>', ListCoursePriceApiView.as_view(), name='ListCoursePriceApiView'),
     path('faq/<str:id>', ListCourseFaqApiView.as_view(), name='ListCourseFaqApiView'),
     path('curriculum/<str:id>', ListCourseCurriculumApiView.as_view(), name='ListCourseCurriculumApiView'),
