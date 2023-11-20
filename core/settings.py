@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'storages',
     'djongo',
     'corsheaders',
+    'lms'
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
