@@ -1,19 +1,16 @@
 from django.contrib import admin
 from django.urls import path, include
-from .views_api import ListTeacherApiView, ListCourseApiView, ListContentApiView, ListDetailTeacherApiView, ListDetailCourseApiView, ListDetailContentApiView, ListCoursePriceApiView, ListCourseFaqApiView, ListCourseCurriculumApiView, ListCourseStudyMethodApiView, ListCourseBatchApiView, ListCourseScheduleApiView, ListTestimonyApiView
+from .views_api import *
 
 urlpatterns = [
-    path('', ListCourseApiView.as_view(), name='ListCourseApiView'),
-    path('teachers', ListTeacherApiView.as_view(), name='ListTeacherApiView'),
-    path('teacher-list/<int:id>', ListDetailTeacherApiView.as_view(), name='ListDetailTeacherApiView'),
-    path('course-list/<int:id>', ListDetailCourseApiView.as_view(), name='ListDetailCourseApiView'),
-    path('content-list', ListContentApiView.as_view(), name='ListContentApiView'),
-    path('content-list/<int:id>', ListDetailContentApiView.as_view(), name='ListDetailContentApiView'),
-    path('prices/<str:id>', ListCoursePriceApiView.as_view(), name='ListCoursePriceApiView'),
-    path('faq/<str:id>', ListCourseFaqApiView.as_view(), name='ListCourseFaqApiView'),
-    path('curriculum/<str:id>', ListCourseCurriculumApiView.as_view(), name='ListCourseCurriculumApiView'),
-    path('study-method/<str:id>', ListCourseStudyMethodApiView.as_view(), name='ListCourseStudyMethodApiView'),
-    path('batch/<str:id>', ListCourseBatchApiView.as_view(), name='ListCourseBatchApiView'),
-    path('schedule/<str:id>', ListCourseScheduleApiView.as_view(), name='ListCourseScheduleApiView'),
-    path('testimony', ListTestimonyApiView.as_view(), name='ListTestimonyApiView'),
+    path('', AllCourseApiView.as_view(), name='all-course'),
+    path('teacher', AllTeacherApiView.as_view(), name='all-teacher'),
+    path('teacher/<str:id>', TeacherDetailApiView.as_view(), name='teacher-detail'),
+    path('prices/<str:id>', CoursePriceApiView.as_view(), name='course-price'),
+    path('faq/<str:id>', CourseFaqApiView.as_view(), name='course-faq'),
+    path('curriculum/<str:id>', CourseCurriculumApiView.as_view(), name='course-curriculum'),
+    path('batch/<str:id>', CourseBatchApiView.as_view(), name='course-batch'),
+    path('schedule/<str:id>', CourseScheduleApiView.as_view(), name='course-schedule'),
+    path('testimony', ListTestimonyApiView.as_view(), name='all-testimony'),
+    path('<str:id>', CourseOverviewApiView.as_view(), name='course-overview'),
 ]

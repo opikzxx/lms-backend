@@ -1,4 +1,4 @@
-from djongo import models
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 import uuid, datetime
 
@@ -46,14 +46,14 @@ class Course(models.Model):
     program = models.ForeignKey(Program, on_delete=models.CASCADE, null=False)
     name = models.CharField(max_length=128, null=False)
     description = models.TextField(null=False)
-    difficulty = models.IntegerField(null=False)
-    duration = models.IntegerField(null=False)
     status = models.CharField(
         max_length=2,
         choices=Status.choices,
         default=Status.COMING_SOON,
         null=False
     )
+    participant_amount = models.IntegerField(default=0)
+    certified_participant_amount = models.IntegerField(default=0)
     image_url = models.ImageField(upload_to='cms-xpert/course/', null=True)
     teacher = models.ManyToManyField(Teacher)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -73,7 +73,6 @@ class CourseDetail(models.Model):
     course_overview = models.TextField(null=False)
     reason = models.TextField(null=False)
     result = models.TextField(null=False)
-    certificate_image_url = models.ImageField(upload_to='cms-xpert/course_detail/', null=True)
     skill = models.TextField(null=False)
 
     def __str__(self):
@@ -108,6 +107,7 @@ class CoursePrice(models.Model):
         verbose_name = 'Course Price'
         verbose_name_plural = 'Course Prices'
 
+# Gak Kepake Lagi
 class CourseStudyMethod(models.Model):
 
     id = models.AutoField(primary_key=True, null=False)
@@ -130,7 +130,7 @@ class CourseCurriculum(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, null=False)
     title = models.CharField(max_length=50, null=False)
     detail = models.TextField(null=False)
-    file = models.FileField(upload_to='cms-xpert/course_curriculum/', null=True)
+    # file = models.FileField(upload_to='cms-xpert/course_curriculum/', null=True)
 
     def __str__(self):
         return self.title
@@ -175,7 +175,7 @@ class CourseBatch(models.Model):
     )
 
     def __str__(self):
-        return self.course
+        return str(self.id)
     
     class Meta:
         db_table = 'course_batch'
@@ -188,6 +188,7 @@ class CourseFaq(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, null=False)
     question = models.CharField(max_length=128, null=False)
     answer = models.TextField(null=False)
+    order = models.IntegerField
 
     def __str__(self):
         return self.question
@@ -197,6 +198,7 @@ class CourseFaq(models.Model):
         verbose_name = 'Course Faq'
         verbose_name_plural = 'Course Faqs'
 
+# Gak Kepake Lagi
 class CourseContent(models.Model):
 
     class ContentType(models.TextChoices):
@@ -218,7 +220,7 @@ class CourseContent(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.course
+        return self.id
     
     class Meta:
         db_table = 'content'
