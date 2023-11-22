@@ -31,7 +31,6 @@ class CourseFaqInline(admin.TabularInline):
 
 class CourseDetailInline(admin.TabularInline):
     model = CourseDetail
-    exclude = ["certificate_image_url"]
 
 class CourseAdmin(admin.ModelAdmin):
     inlines = [
@@ -42,7 +41,7 @@ class CourseAdmin(admin.ModelAdmin):
         CourseFaqInline,
         CoursePriceInline,
         ]
-    exclude = ['id','created_at','updated_at', 'image_url', 'difficulty', 'duration', 'status', 'teacher']
+    exclude = ['id','created_at','updated_at']
 
 class CourseContentAdmin(admin.ModelAdmin):
     exclude = ['id','created_at','updated_at']
@@ -57,7 +56,7 @@ class CoursePriceAdmin(admin.ModelAdmin):
     exclude = ['id','created_at','updated_at']
 
 class CourseStudyMethodAdmin(admin.ModelAdmin):
-    exclude = ['id','created_at','updated_at', 'course']
+    exclude = ['id','created_at','updated_at']
 
 class CourseCurriculumAdmin(admin.ModelAdmin):
     exclude = ['id','created_at','updated_at']
