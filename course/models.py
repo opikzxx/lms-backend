@@ -107,6 +107,7 @@ class CoursePrice(models.Model):
         verbose_name = 'Course Price'
         verbose_name_plural = 'Course Prices'
 
+# Gak Kepake Lagi
 class CourseStudyMethod(models.Model):
 
     id = models.AutoField(primary_key=True, null=False)
@@ -197,6 +198,7 @@ class CourseFaq(models.Model):
         verbose_name = 'Course Faq'
         verbose_name_plural = 'Course Faqs'
 
+# Gak Kepake Lagi
 class CourseContent(models.Model):
 
     class ContentType(models.TextChoices):

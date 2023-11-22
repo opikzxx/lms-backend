@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from library.helper.interface import response
 from library.helper.wrapper import validate_serializer
 
-class ListCourseApiView(APIView):
+class AllCourseApiView(APIView):
     def get(self, request, **kwargs):
         program_id = request.GET.get('program_id')
         availability = request.GET.get('availability')
@@ -39,7 +39,16 @@ class ListCourseApiView(APIView):
         
         return Response(response(200, "success", program_data), status=status.HTTP_200_OK)
 
-class ListTeacherApiView(APIView):
+class CourseOverviewApiView(APIView):
+    def get(self, request, id):
+        try:
+            data = Course.objects.get(id=id)
+            serializer = CourseOverviewModelSerializer(data)
+            return Response(response(200, "success", serializer.data), status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(response(404, "ID Not Found", None, type(e).__name__), status=status.HTTP_404_NOT_FOUND)
+        
+class AllTeacherApiView(APIView):
     def get(self, request, **kwargs):
         limit = request.GET.get('limit')
 
@@ -50,56 +59,59 @@ class ListTeacherApiView(APIView):
         serializer = TeacherModelSerializer(teachers, many=True)
         return Response(response(200, "success", serializer.data), status=status.HTTP_200_OK)
 
-class ListCoursePriceApiView(APIView):
+class CoursePriceApiView(APIView):
     def get(self, request, id):
-        data = Course.objects.filter(id=id).first()
-        test = CoursePrice.objects.filter(course_id=data)
-        serializer = CoursePriceModelSerializer(test, many=True)
-        return Response({"status": "success", "data":serializer.data}, status=status.HTTP_200_OK)
+        try:
+            course = Course.objects.filter(id=id).first()
+            price = CoursePrice.objects.filter(course_id=course)
+            if len(price)>0:
+                serializer = CoursePriceModelSerializer(price, many=True)
+                return Response(response(200, "success", serializer.data), status=status.HTTP_200_OK)
+            else:
+                return Response(response(204, "No Data", []), status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            return Response(response(404, "ID Not Found", None, type(e).__name__), status=status.HTTP_404_NOT_FOUND)
     
-class ListCourseFaqApiView(APIView):
+class CourseFaqApiView(APIView):
     def get(self, request, id):
-        data = Course.objects.filter(id=id).first()
-        test = CourseFaq.objects.filter(course_id=data)
-        if len(test)>0:
-            serializer = CourseFaqModelSerializer(test, many=True)
-            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
-        else:
-            return Response({"status": "doesn't exist", "data":None}, status=status.HTTP_204_NO_CONTENT)
+        try:
+            course = Course.objects.filter(id=id).first()
+            faq = CourseFaq.objects.filter(course_id=course)
+            if len(faq)>0:
+                serializer = CourseFaqModelSerializer(faq, many=True)
+                return Response(response(200, "success", serializer.data), status=status.HTTP_200_OK)
+            else:
+                return Response(response(204, "No Data", []), status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            return Response(response(404, "ID Not Found", None, type(e).__name__), status=status.HTTP_404_NOT_FOUND)
 
-class ListCourseStudyMethodApiView(APIView):
+class CourseBatchApiView(APIView):
     def get(self, request, id):
-        data = Course.objects.filter(id=id).first()
-        test = CourseStudyMethod.objects.filter(course=data)
-        if len(test)>0:
-            serializer = CourseStudyMethodModelSerializer(test, many=True)
-            return Response({"status": "success", "data":serializer.data}, status=status.HTTP_200_OK)
-        else:
-            return Response({"status": "doesn't exist", "data":None}, status=status.HTTP_204_NO_CONTENT)
+        try:
+            course = Course.objects.filter(id=id).first()
+            batch = CourseBatch.objects.filter(course_id=course)
+            if len(batch)>0:
+                serializer = CourseBatchModelSerializer(batch, many=True)
+                return Response(response(200, "success", serializer.data), status=status.HTTP_200_OK)
+            else:
+                return Response(response(204, "No Data", []), status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            return Response(response(404, "ID Not Found", None, type(e).__name__), status=status.HTTP_404_NOT_FOUND)
 
-class ListCourseBatchApiView(APIView):
+class CourseCurriculumApiView(APIView):
     def get(self, request, id):
-        data = Course.objects.filter(id=id).first()
-        test = CourseBatch.objects.filter(course=data)
-        if len(test)>0:
-            serializer = CourseBatchModelSerializer(test, many=True)
-            return Response({"status": "success", "data":serializer.data}, status=status.HTTP_200_OK)
-        else:
-            return Response({"status": "doesn't exist", "data":None}, status=status.HTTP_204_NO_CONTENT)
+        try:
+            course = Course.objects.filter(id=id).first()
+            curriculum = CourseCurriculum.objects.filter(course_id=course)
+            if len(curriculum)>0:
+                serializer = CourseCurriculumModelSerializer(curriculum, many=True)
+                return Response(response(200, "success", serializer.data), status=status.HTTP_200_OK)
+            else:
+                return Response(response(204, "No Data", []), status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            return Response(response(404, "ID Not Found", None, type(e).__name__), status=status.HTTP_404_NOT_FOUND)
 
-class ListCourseCurriculumApiView(APIView):
-    def get(self, request, id):
-        data = Course.objects.filter(id=id).first()
-        test = CourseCurriculum.objects.filter(course_id=data)
-        if len(test)>0:
-            serializer = CourseCurriculumModelSerializer(test, many=True)
-            return Response({"status": "success", "data":serializer.data}, status=status.HTTP_200_OK)
-        else:
-            return Response({"status": "doesn't exist", "data":None}, status=status.HTTP_204_NO_CONTENT)
-
-# 3 kebawah udah di fix 
-
-class ListCourseScheduleApiView(APIView):
+class CourseScheduleApiView(APIView):
     def get(self, request, id):
         try:
             course = Course.objects.filter(id=id).first()
@@ -109,26 +121,18 @@ class ListCourseScheduleApiView(APIView):
                 return Response(response(200, "success", serializer.data), status=status.HTTP_200_OK)
             else:
                 return Response(response(204, "No Data", []), status=status.HTTP_204_NO_CONTENT)
-        except:
-            return Response(response(404, "ID Not Found", None), status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            return Response(response(404, "ID Not Found", None, type(e).__name__), status=status.HTTP_404_NOT_FOUND)
 
-class ListDetailTeacherApiView(APIView):
+class TeacherDetailApiView(APIView):
     def get(self, request, id):
         try:
             data = Teacher.objects.get(id=id)
             serializer = TeacherModelSerializer(data)
             return Response(response(200, "success", serializer.data), status=status.HTTP_200_OK)
-        except:
-            return Response(response(404, "ID Not Found", None), status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            return Response(response(404, "ID Not Found", None, type(e).__name__), status=status.HTTP_404_NOT_FOUND)
 
-class ListDetailCourseApiView(APIView):
-    def get(self, request, id):
-        try:
-            data = Course.objects.get(id=id)
-            serializer = CourseOverviewModelSerializer(data)
-            return Response(response(200, "success", serializer.data), status=status.HTTP_200_OK)
-        except:
-            return Response(response(404, "ID Not Found", None), status=status.HTTP_204_NO_CONTENT)
 
 class ListTestimonyApiView(APIView):
     def get(self, request, **kwargs):
