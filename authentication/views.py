@@ -8,7 +8,7 @@ from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from rest_framework.permissions import IsAuthenticated
 from .models import User, BlacklistedToken, CompanyAccount, PersonalAccount
 from .serializers import *
-from .wrapper import validate_serializer
+from library.helper.wrapper import validate_serializer
 from rest_framework import status
 
 @api_view(["POST"])

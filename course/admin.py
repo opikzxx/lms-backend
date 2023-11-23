@@ -35,7 +35,6 @@ class CourseDetailInline(admin.TabularInline):
 class CourseAdmin(admin.ModelAdmin):
     inlines = [
         CourseDetailInline,
-        CourseStudyMethodInline, 
         CourseScheduleInline, 
         CourseCurriculumInline, 
         CourseBatchInline,
@@ -57,7 +56,7 @@ class CoursePriceAdmin(admin.ModelAdmin):
     exclude = ['id','created_at','updated_at']
 
 class CourseStudyMethodAdmin(admin.ModelAdmin):
-    exclude = ['id','created_at','updated_at', 'course']
+    exclude = ['id','created_at','updated_at']
 
 class CourseCurriculumAdmin(admin.ModelAdmin):
     exclude = ['id','created_at','updated_at']
@@ -76,7 +75,7 @@ class TestimonyAdmin(admin.ModelAdmin):
 
 admin.site.register(Teacher, TeacherAdmin)
 admin.site.register(Course, CourseAdmin)
-admin.site.register(CourseContent, CourseContentAdmin)
+# admin.site.register(CourseContent, CourseContentAdmin)
 admin.site.register(Program, ProgramAdmin)
 # admin.site.register(CourseDetail, CourseDetailAdmin)
 # admin.site.register(CoursePrice, CoursePriceAdmin)
