@@ -173,6 +173,7 @@ class CourseBatch(models.Model):
         default=Status.AVAILABLE,
         null=False
     )
+    no = models.IntegerField()
 
     def __str__(self):
         return str(self.id)

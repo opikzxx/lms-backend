@@ -14,3 +14,5 @@ urlpatterns = [
     path('testimony', ListTestimonyApiView.as_view(), name='all-testimony'),
     path('<str:id>', CourseOverviewApiView.as_view(), name='course-overview'),
 ]
+
+# Biarin url <str:id> di paling bawah

@@ -26,6 +26,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/user/', include("authentication.urls")),
     path('api/courses/', include('course.urls_api')),
+    path('api/lms/', include('lms.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

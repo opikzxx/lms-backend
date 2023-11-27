@@ -124,3 +124,8 @@ class CourseSession(models.Model):
     lesson_link = models.TextField()
     ordering = models.IntegerField()
 
+class LastAccess(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    course_batch = models.ForeignKey(CourseBatch, on_delete=models.CASCADE)
+    last_access = models.DateTimeField()
