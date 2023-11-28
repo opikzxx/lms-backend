@@ -107,23 +107,6 @@ class CoursePrice(models.Model):
         verbose_name = 'Course Price'
         verbose_name_plural = 'Course Prices'
 
-# Gak Kepake Lagi
-class CourseStudyMethod(models.Model):
-
-    id = models.AutoField(primary_key=True, null=False)
-    course = models.ManyToManyField(Course)
-    title = models.CharField(max_length=50, null=False)
-    detail = models.TextField(null=False)
-    image_url = models.ImageField(upload_to='cms-xpert/course_study/', null=True)
-
-    def __str__(self):
-        return self.title
-    
-    class Meta:
-        db_table = 'course_study_method'
-        verbose_name = 'Course Study Method'
-        verbose_name_plural = 'Course Study Methods'
-
 class CourseCurriculum(models.Model):
 
     id = models.AutoField(primary_key=True, null=False)
