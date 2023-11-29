@@ -88,7 +88,6 @@ def create_courses(programs, teachers):
             status=random.choice(status),
         )
         course.teacher.set(teachers)
-        course.save()
         courses.append(course)
         print("{} course created.".format(course))
     return courses
