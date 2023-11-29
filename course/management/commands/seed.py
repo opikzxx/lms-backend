@@ -82,7 +82,6 @@ def create_courses(programs, teachers):
     for i in range(5):
         course = Course.objects.create(
             program=random.choice(programs),
-            # teacher=random.choice(teachers),
             name=random.choice(course_names),
             description="ini course dummy",
             status=random.choice(status),
@@ -228,6 +227,7 @@ def create_course_batch(courses):
             open_date=date(2020, 12, 31),
             close_date=date(2020, 12, 31),
             start_date=date(2020, 12, 31),
+            end_date=date(2020, 12, 31),
             no=i
         )
         courses.append(course)
