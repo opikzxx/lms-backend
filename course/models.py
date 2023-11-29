@@ -164,9 +164,10 @@ class CourseBatch(models.Model):
 
     id = models.AutoField(primary_key=True, null=False)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, null=False)
-    open_date = models.DateField(null=False)
-    close_date = models.DateField(null=False)
+    open_date = models.DateField(null=True)
+    close_date = models.DateField(null=True)
     start_date = models.DateField(null=False)
+    end_date = models.DateField(null=False)
     status = models.CharField(
         max_length=2,
         choices=Status.choices,
@@ -189,7 +190,7 @@ class CourseFaq(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, null=False)
     question = models.CharField(max_length=128, null=False)
     answer = models.TextField(null=False)
-    order = models.IntegerField
+    order = models.IntegerField()
 
     def __str__(self):
         return self.question
