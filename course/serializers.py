@@ -58,6 +58,13 @@ class CourseOverviewModelSerializer(serializers.ModelSerializer):
 
     def get_status(self, obj):
         return obj.get_status_display()
+    
+class CourseCardModelSerializer(serializers.ModelSerializer):
+    course_price = CoursePriceModelSerializer(source='courseprice_set', many=True)
+    
+    class Meta:
+            model= Course
+            fields= ["id","name","description","image_url", "course_price"]
 
 class ProgramModelSerializer(serializers.ModelSerializer):
     class Meta:

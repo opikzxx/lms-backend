@@ -147,9 +147,10 @@ class CourseBatch(models.Model):
 
     id = models.AutoField(primary_key=True, null=False)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, null=False)
-    open_date = models.DateField(null=False)
-    close_date = models.DateField(null=False)
+    open_date = models.DateField(null=True)
+    close_date = models.DateField(null=True)
     start_date = models.DateField(null=False)
+    end_date = models.DateField(null=False)
     status = models.CharField(
         max_length=2,
         choices=Status.choices,
@@ -172,7 +173,7 @@ class CourseFaq(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, null=False)
     question = models.CharField(max_length=128, null=False)
     answer = models.TextField(null=False)
-    order = models.IntegerField
+    order = models.IntegerField()
 
     def __str__(self):
         return self.question
@@ -181,35 +182,6 @@ class CourseFaq(models.Model):
         db_table = 'course_faq'
         verbose_name = 'Course Faq'
         verbose_name_plural = 'Course Faqs'
-
-# Gak Kepake Lagi
-class CourseContent(models.Model):
-
-    class ContentType(models.TextChoices):
-        TEXT = 'Text', _('Text')
-        VIDEO = 'Video', _('Video')
-    
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True, null=False)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, null=False)
-    content_type = models.CharField(
-        max_length=10,
-        choices=ContentType.choices,
-        default=ContentType.TEXT,
-        null=False
-    )
-    description = models.TextField(null=False)
-    ordering = models.IntegerField(null=False)
-    youtube_url=models.CharField(max_length=255, null=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.id
-    
-    class Meta:
-        db_table = 'content'
-        verbose_name = 'Content'
-        verbose_name_plural = 'Contents'
 
 class Testimony(models.Model):
     
