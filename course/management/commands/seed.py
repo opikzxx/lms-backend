@@ -103,14 +103,46 @@ def create_detail_course(courses):
         "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
     ]
 
-    skills = ["Coding", "Designing"]
+    reason=[
+        """ 
+        {
+        "overview": "Digital marketing adalah suatu bidang yang berfokus pada pemasaran dan promosi produk atau layanan menggunakan platform digital seperti internet, media sosial, email, mesin pencari, dan berbagai kanal online lainnya. Ini adalah upaya untuk menjangkau audiens target dan membangun hubungan dengan mereka melalui berbagai metode dan strategi digital.",
+        "content": [
+            {
+            "title": "Permintaan yang Terus Meningkat",
+            "detail": "Dalam era digital yang terus berkembang, permintaan akan profesional digital marketing terus tumbuh. Bisnis dari berbagai industri mengandalkan digital marketing untuk mencapai audiens mereka secara efektif dan berkompetitif di pasar."
+            },
+            {
+            "title": "Peluang Karier yang Luas",
+            "detail": "Digital marketing mencakup SEO, email marketing, periklanan online, dan analisis data. Ini memberikan banyak peluang karier yang beragam dan memungkinkan untuk mengejar jalur yang sesuai dengan minat dan kompetensi."
+            }
+        ]
+        }"""
+    ]
+
+    result = [""" 
+        {
+        "content": [
+            {
+            "title": "Real Protofolio",
+            "detail": "Lorem ipsum dolor sit amet. Sit quia maiores qui error labore qui suscipit illo et quia sequi sit dolore, "
+            },
+            {
+            "title": "Job Placement Recomendation",
+            "detail": "Lorem ipsum dolor sit amet. Sit quia maiores qui error labore qui suscipit illo et quia sequi sit dolore, "
+            }
+        ]
+        }
+    """]
+
+    skills = ["Marketing;Sales;", "Komunikasi;Data Analisis;Sosial;Media;Advertising;Kepemimpina;Manajemen;Strategi;", ";Brand;Management;Komunikasi Bisnis;"]
 
     for i in range(5):
         course = CourseDetail.objects.create(
             id=courses[i],
             course_overview=random.choice(course_overviews),
-            reason=random.choice(course_overviews),
-            result=random.choice(course_overviews),
+            reason=random.choice(reason),
+            result=random.choice(result),
             skill=random.choice(skills),
         )
         courses.append(course)
