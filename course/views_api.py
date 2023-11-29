@@ -30,7 +30,7 @@ class AllCourseApiView(APIView):
             if limit:
                 courses = courses[:int(limit)]
 
-            course_serializer = CourseOverviewModelSerializer(courses, many=True)
+            course_serializer = CourseCardModelSerializer(courses, many=True)
             
             program_serializer = ProgramModelSerializer(program)
             data = program_serializer.data

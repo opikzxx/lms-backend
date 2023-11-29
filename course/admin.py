@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Course, CourseContent, Teacher, Program, CourseDetail, CoursePrice, CourseStudyMethod, CourseCurriculum, CourseSchedule, CourseBatch,CourseFaq, Testimony
+from .models import Course, Teacher, Program, CourseDetail, CoursePrice, CourseCurriculum, CourseSchedule, CourseBatch,CourseFaq, Testimony
 
 # Register your models here.
 class TeacherAdmin(admin.ModelAdmin):
@@ -16,10 +16,6 @@ class CourseCurriculumInline(admin.TabularInline):
 class CourseScheduleInline(admin.TabularInline):
     model = CourseSchedule
     exclude = ['id']
-
-class CourseStudyMethodInline(admin.TabularInline):
-    model = CourseStudyMethod.course.through
-    extra = 1
 
 class CourseBatchInline(admin.TabularInline):
     model = CourseBatch
@@ -79,7 +75,6 @@ admin.site.register(Course, CourseAdmin)
 admin.site.register(Program, ProgramAdmin)
 # admin.site.register(CourseDetail, CourseDetailAdmin)
 # admin.site.register(CoursePrice, CoursePriceAdmin)
-admin.site.register(CourseStudyMethod, CourseStudyMethodAdmin)
 # admin.site.register(CourseCurriculum, CourseCurriculumAdmin)
 # admin.site.register(CourseSchedule, CourseScheduleAdmin)
 # admin.site.register(CourseBatch, CourseBatchAdmin)
