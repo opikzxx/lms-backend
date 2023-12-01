@@ -17,10 +17,10 @@ class Enrollment(models.Model):
         choices=EnrollmentType.choices,
         default=EnrollmentType.BELAJAR,
     )
-    rating = models.IntegerField()
-    ratingDetail = models.TextField()
-    finalScore = models.DecimalField(max_digits=3, decimal_places=2)
-    certificateUrl = models.CharField(max_length=255)
+    rating = models.IntegerField(null=True)
+    ratingDetail = models.TextField(null=True)
+    finalScore = models.DecimalField(max_digits=3, decimal_places=2, null=True)
+    certificateUrl = models.CharField(max_length=255, null=True)
 
 class CourseAssignment(models.Model):
     class Accessibility(models.TextChoices):
@@ -30,7 +30,7 @@ class CourseAssignment(models.Model):
     id = models.AutoField(primary_key=True)
     course_batch = models.ForeignKey(CourseBatch, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
-    file = models.CharField(max_length=128)
+    file = models.CharField(max_length=128, null=True)
     accesibility = models.CharField(
         max_length=2, 
         choices=Accessibility.choices,
@@ -53,10 +53,10 @@ class AssignmentAttachment(models.Model):
         choices=Status.choices,
         default=Status.BELUM_SUBMIT
     )
-    feedback = models.TextField()
-    submitted_date = models.DateTimeField()
-    score = models.DecimalField(max_digits=3, decimal_places=2)
-    file = models.CharField(max_length=64)
+    feedback = models.TextField(null=True)
+    submitted_date = models.DateTimeField(null=True)
+    score = models.DecimalField(max_digits=3, decimal_places=2, null=True)
+    file = models.CharField(max_length=64, null=True)
 
 class CourseQuiz(models.Model):
     class Accessibility(models.TextChoices):
@@ -70,8 +70,8 @@ class CourseQuiz(models.Model):
     id = models.AutoField(primary_key=True)
     course_batch = models.ForeignKey(CourseBatch, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
-    duration = models.IntegerField()
-    minimum_score = models.DecimalField(max_digits=3, decimal_places=2)
+    duration = models.IntegerField(default=10)
+    minimum_score = models.DecimalField(max_digits=3, decimal_places=2, null=True)
     Accessibility = models.CharField(
         max_length=2, 
         choices=Accessibility.choices,
@@ -82,7 +82,7 @@ class CourseQuiz(models.Model):
         choices=Status.choices,
         default=Status.DRAFT
     )
-    ordering = models.IntegerField()
+    ordering = models.IntegerField(null=True)
     deadline = models.DateTimeField()
 
 class QuizQuestion(models.Model):
@@ -94,38 +94,38 @@ class QuizOption(models.Model):
     id = models.AutoField(primary_key=True)
     question = models.ForeignKey(QuizQuestion, on_delete=models.CASCADE)
     value = models.TextField()
-    is_correct = models.BooleanField()
+    is_correct = models.BooleanField(default=False)
 
 class QuizUser(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     quiz = models.ForeignKey(CourseQuiz, on_delete=models.CASCADE)
-    score = models.DecimalField(max_digits=3, decimal_places=2)
-    correct_answer = models.IntegerField()
+    score = models.DecimalField(max_digits=3, decimal_places=2, null=True)
+    correct_answer = models.IntegerField(null=True)
     question_order = models.TextField()
     target_time = models.DateTimeField()
-    completion_time = models.DateTimeField()
-    is_remedial = models.BooleanField()
+    completion_time = models.DateTimeField(null=True)
+    is_remedial = models.BooleanField(default=False)
     attempt = models.IntegerField()
 
 class QuizUserAnswer(models.Model):
     id = models.AutoField(primary_key=True)
     quiz_user = models.ForeignKey(QuizUser, on_delete=models.CASCADE)
     question = models.ForeignKey(QuizQuestion, on_delete=models.CASCADE)
-    answer = models.ForeignKey(QuizOption, on_delete=models.CASCADE)
+    answer = models.ForeignKey(QuizOption, on_delete=models.CASCADE, null=True)
 
 class CourseSession(models.Model):
     id = models.AutoField(primary_key=True)
     course_batch = models.ForeignKey(CourseBatch, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     time = models.DateTimeField()
-    meeting_link = models.TextField()
-    record_link = models.TextField()
-    lesson_link = models.TextField()
+    meeting_link = models.TextField(null=True)
+    record_link = models.TextField(null=True)
+    lesson_link = models.TextField(null=True)
     ordering = models.IntegerField()
 
 class LastAccess(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    course_batch = models.ForeignKey(CourseBatch, on_delete=models.CASCADE)
-    last_access = models.DateTimeField()
+    course_batch = models.ForeignKey(CourseBatch, on_delete=models.CASCADE, null=True)
+    last_access = models.DateTimeField(null=True)

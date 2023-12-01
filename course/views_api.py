@@ -12,12 +12,12 @@ from library.helper.wrapper import validate_serializer
 
 class AllCourseApiView(APIView):
     def get(self, request, **kwargs):
-        program_id = request.GET.get('program_id')
+        program_slug = request.GET.get('program')
         availability = request.GET.get('availability')
         limit = request.GET.get('limit')
 
-        if program_id:
-            programs = Program.objects.filter(id=program_id)
+        if program_slug:
+            programs = Program.objects.filter(slug=program_slug)
         else: 
             programs = Program.objects.all()
 

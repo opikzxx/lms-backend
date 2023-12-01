@@ -26,6 +26,7 @@ class Teacher(models.Model):
     linkedinUrl = models.CharField(max_length=128, blank=True, null=True)
     profileImageUrl = models.ImageField(upload_to='cms-xpert/teacher_profile/', null=True)
     companyImageUrl = models.ImageField(upload_to='cms-xpert/teacher_profile_comapny/', null=True)
+    isShownAtHomepage = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -34,6 +35,13 @@ class Teacher(models.Model):
         db_table = 'teacher'
         verbose_name = 'Teacher'
         verbose_name_plural = 'Teachers'
+
+class XpertOverview(models.Model):
+    id = models.AutoField(primary_key=True, null=False)
+    peserta_tergabung = models.IntegerField(null=False)
+    peserta_tersertifikasi = models.IntegerField(null=False)
+    kelas_online = models.IntegerField(null=False)
+    kegiatan_inhouse = models.IntegerField(null=False)
 
 class Course(models.Model):
     class Status(models.TextChoices):
@@ -158,6 +166,8 @@ class CourseBatch(models.Model):
         null=False
     )
     no = models.IntegerField()
+    isShownAtHomepage = models.BooleanField(default=False)
+    isSoldOut = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.id)
