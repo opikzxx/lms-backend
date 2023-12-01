@@ -1,7 +1,14 @@
 from django.core.management.base import BaseCommand
-import random
-from datetime import date
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth import get_user_model
 
+import datetime
+from datetime import date
+import random
+from decimal import Decimal
+
+# from authentication.models import User
+from lms.models import *
 from course.models import *
 
 """ Clear all data and creates addresses """
@@ -24,6 +31,8 @@ class Command(BaseCommand):
 def clear_data():
     """Deletes all the table data"""
     print("Delete all instances")
+    User = get_user_model()
+    User.objects.filter(email='tito123@gmail.com').delete()
     Program.objects.all().delete()
     Teacher.objects.all().delete()
     Course.objects.all().delete()
@@ -34,6 +43,17 @@ def clear_data():
     CourseBatch.objects.all().delete()
     CourseFaq.objects.all().delete()
     Testimony.objects.all().delete()
+    
+    Enrollment.objects.all().delete()
+    CourseAssignment.objects.all().delete()
+    AssignmentAttachment.objects.all().delete()
+    CourseQuiz.objects.all().delete()
+    QuizQuestion.objects.all().delete()
+    QuizOption.objects.all().delete()
+    QuizUser.objects.all().delete()
+    QuizUserAnswer.objects.all().delete()
+    CourseSession.objects.all().delete()
+    LastAccess.objects.all().delete()
 
 def create_programs():
     """Creates an Program object combining different elements from the list"""
@@ -102,37 +122,33 @@ def create_detail_course(courses):
         "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
     ]
 
-    reason=[
-        """ 
-        {
-        "overview": "Digital marketing adalah suatu bidang yang berfokus pada pemasaran dan promosi produk atau layanan menggunakan platform digital seperti internet, media sosial, email, mesin pencari, dan berbagai kanal online lainnya. Ini adalah upaya untuk menjangkau audiens target dan membangun hubungan dengan mereka melalui berbagai metode dan strategi digital.",
-        "content": [
-            {
-            "title": "Permintaan yang Terus Meningkat",
-            "detail": "Dalam era digital yang terus berkembang, permintaan akan profesional digital marketing terus tumbuh. Bisnis dari berbagai industri mengandalkan digital marketing untuk mencapai audiens mereka secara efektif dan berkompetitif di pasar."
-            },
-            {
-            "title": "Peluang Karier yang Luas",
-            "detail": "Digital marketing mencakup SEO, email marketing, periklanan online, dan analisis data. Ini memberikan banyak peluang karier yang beragam dan memungkinkan untuk mengejar jalur yang sesuai dengan minat dan kompetensi."
-            }
-        ]
-        }"""
-    ]
-
-    result = [""" 
-        {
-        "content": [
-            {
-            "title": "Real Protofolio",
-            "detail": "Lorem ipsum dolor sit amet. Sit quia maiores qui error labore qui suscipit illo et quia sequi sit dolore, "
-            },
-            {
-            "title": "Job Placement Recomendation",
-            "detail": "Lorem ipsum dolor sit amet. Sit quia maiores qui error labore qui suscipit illo et quia sequi sit dolore, "
-            }
-        ]
+    reason= {
+            "overview": "Digital marketing adalah suatu bidang yang berfokus pada pemasaran dan promosi produk atau layanan menggunakan platform digital seperti internet, media sosial, email, mesin pencari, dan berbagai kanal online lainnya. Ini adalah upaya untuk menjangkau audiens target dan membangun hubungan dengan mereka melalui berbagai metode dan strategi digital.",
+            "content": [
+                {
+                    "title": "Permintaan yang Terus Meningkat",
+                    "detail": "Dalam era digital yang terus berkembang, permintaan akan profesional digital marketing terus tumbuh. Bisnis dari berbagai industri mengandalkan digital marketing untuk mencapai audiens mereka secara efektif dan berkompetitif di pasar."
+                },
+                {
+                    "title": "Peluang Karier yang Luas",
+                    "detail": "Digital marketing mencakup SEO, email marketing, periklanan online, dan analisis data. Ini memberikan banyak peluang karier yang beragam dan memungkinkan untuk mengejar jalur yang sesuai dengan minat dan kompetensi."
+                }
+            ]
         }
-    """]
+    
+
+    result = {
+        "content": [
+            {
+                "title": "Real Protofolio",
+                "detail": "Lorem ipsum dolor sit amet. Sit quia maiores qui error labore qui suscipit illo et quia sequi sit dolore, "
+            },
+            {
+                "title": "Job Placement Recomendation",
+                "detail": "Lorem ipsum dolor sit amet. Sit quia maiores qui error labore qui suscipit illo et quia sequi sit dolore, "
+            }
+        ]
+    }
 
     skills = ["Marketing;Sales;", "Komunikasi;Data Analisis;Sosial;Media;Advertising;Kepemimpina;Manajemen;Strategi;", ";Brand;Management;Komunikasi Bisnis;"]
 
@@ -140,8 +156,8 @@ def create_detail_course(courses):
         course = CourseDetail.objects.create(
             id=courses[i],
             course_overview=random.choice(course_overviews),
-            reason=random.choice(reason),
-            result=random.choice(result),
+            reason=reason,
+            result=result,
             skill=random.choice(skills),
         )
         courses.append(course)
@@ -220,6 +236,8 @@ def create_course_batch(courses):
         "AV", "SO"
     ]
 
+    course_batchs = []
+
     for i in range(5):
         course = CourseBatch.objects.create(
             course=courses[i],
@@ -230,9 +248,9 @@ def create_course_batch(courses):
             end_date=date(2020, 12, 31),
             no=i
         )
-        courses.append(course)
+        course_batchs.append(course)
         print("{} Schedule created.".format(course))
-    return courses
+    return course_batchs
 
 def create_course_faq(courses):
     """Creates an Course Faq object combining different elements from the list"""
@@ -278,6 +296,151 @@ def create_course_testimony(courses):
         print("{} Testimony created.".format(course))
     return courses
 
+
+def create_enrollments(user, course_batchs):
+    """Creates an enrollment object combining different elements from the list"""
+    print("Creating enrollment")
+    enrollments = []
+    types = ['BL', 'SR']
+    dummy=[
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", 
+        "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat",
+        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+        "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    ]
+
+    for i in range(5):
+        enrollment = Enrollment.objects.create(
+            course_batch=course_batchs[i],
+            user=user,
+            enrollment_type=random.choice(types),
+        )
+        enrollments.append(enrollment)
+        print("{} enrollment created.".format(enrollment))
+    return enrollments
+
+def create_course_assignment(course_batchs):
+    """Creates an course assignment object combining different elements from the list"""
+    print("Creating course assignment")
+    course_assignments = []
+    accessibilities = ['OP', 'CL']
+    dummy=[
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", 
+        "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat",
+        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+        "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    ]
+
+    for i in range(5):
+        assignment = CourseAssignment.objects.create(
+            course_batch=course_batchs[i],
+            accesibility=random.choice(accessibilities),
+            title='assignment ' + str(i),
+            file=random.choice(dummy),
+            ordering=i,
+            deadline=date(2020, 12, 31),
+        )
+        course_assignments.append(assignment)
+        print("{} assignment created.".format(assignment))
+    return course_assignments
+
+def create_assignment_attachment(user, course_assignments):
+    """Creates an Course object combining different elements from the list"""
+    print("Creating assignment attachment")
+
+    assignments = []
+
+    status = ['BS', 'RV', 'SL']
+
+    for i in range(5):
+        assignment = AssignmentAttachment.objects.create(
+            user=user,
+            assignment=course_assignments[i],
+            status=random.choice(status),
+        )
+        assignments.append(assignment)
+        print("{} assignment created.".format(assignment))
+    return assignments
+
+def create_course_quiz(course_batchs):
+    """Creates an Course quiz object combining different elements from the list"""
+    print("Creating quiz courses")
+    quizs=[]
+    accesibilities = ['OP', 'CL']
+    status = ['DR', 'FN']
+    
+    questions=[
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", 
+        "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat",
+        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+        "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    ]
+
+    answers=[
+        "Nunc sed augue lacus viverra vitae congue.",
+        "Nulla facilisi etiam dignissim diam quis enim."
+        "Pellentesque elit eget gravida cum sociis natoque penatibus et.",
+        "Sed elementum tempus egestas sed sed risus pretium quam vulputate."
+    ]
+
+    for i in range(5):
+        quiz = CourseQuiz.objects.create(
+            course_batch=course_batchs[i],
+            title=f'quiz {i}',
+            duration=10,
+            minimum_score=Decimal('50.00'),
+            Accessibility=random.choice(accesibilities),
+            status=random.choice(status),
+            ordering=i,
+            deadline=date(2020, 12, 31),
+        )
+        quizs.append(quiz)
+        print("{} quiz created.".format(quiz))
+        
+        for j in range(10):
+            question = QuizQuestion.objects.create(
+                course_quiz=quiz,
+                question=random.choice(questions),
+                ordering=j
+            )
+
+            for k in range(4):
+                if(k==3):
+                    QuizOption.objects.create(
+                        question=question,
+                        value=random.choice(answers),
+                        is_correct=True
+                    )
+                else:
+                    QuizOption.objects.create(
+                        question=question,
+                        value=random.choice(answers),
+                    )
+    return quizs
+
+def create_course_session(course_batchs):
+    """Creates an course session object combining different elements from the list"""
+    print("Creating course session")
+    sessions = []
+    
+    dummy=[
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", 
+        "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat",
+        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+        "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    ]
+
+    for i in range(5):
+        session = CourseSession.objects.create(
+            course_batch=course_batchs[i],
+            title=random.choice(dummy),
+            time=datetime.datetime.now(),
+            ordering=1
+        )
+        sessions.append(session)
+        print("{} course session created.".format(session))
+    return sessions
+
 def run_seed(self, mode):
     """ Seed database based on mode
 
@@ -288,6 +451,17 @@ def run_seed(self, mode):
     clear_data()
     if mode == MODE_CLEAR:
         return
+    User = get_user_model()
+    user = User.objects.create(
+        email='tito123@gmail.com',
+        username='tito123',
+        password=make_password('password'),
+        birth_date=date(2000, 11, 11),
+        gender='L',
+        account_type='PR',
+        phone_number='1234567889',
+        role='US'
+    )
 
     programs = create_programs()
     teachers = create_teachers()
@@ -297,6 +471,12 @@ def run_seed(self, mode):
     create_courses_price(courses)
     create_courses_curicullum(courses)
     create_courses_schedule(courses)
-    create_course_batch(courses)
+    course_batchs = create_course_batch(courses)
     create_course_faq(courses)
     create_course_testimony(courses)
+
+    create_enrollments(user, course_batchs)
+    course_assignments = create_course_assignment(course_batchs)
+    create_assignment_attachment(user, course_assignments)
+    create_course_quiz(course_batchs)
+    create_course_session(course_batchs)
