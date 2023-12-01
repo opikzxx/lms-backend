@@ -79,8 +79,8 @@ class CourseDetail(models.Model):
 
     id = models.OneToOneField(Course, on_delete=models.CASCADE, null=False, primary_key=True)
     course_overview = models.TextField(null=False)
-    reason = models.TextField(null=False)
-    result = models.TextField(null=False)
+    reason = models.JSONField(null=False)
+    result = models.JSONField(null=False)
     skill = models.TextField(null=False)
 
     def __str__(self):

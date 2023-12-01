@@ -19,7 +19,7 @@ class Enrollment(models.Model):
     )
     rating = models.IntegerField(null=True)
     ratingDetail = models.TextField(null=True)
-    finalScore = models.DecimalField(max_digits=3, decimal_places=2, null=True)
+    finalScore = models.DecimalField(max_digits=5, decimal_places=2, null=True)
     certificateUrl = models.CharField(max_length=255, null=True)
 
 class CourseAssignment(models.Model):
@@ -55,7 +55,7 @@ class AssignmentAttachment(models.Model):
     )
     feedback = models.TextField(null=True)
     submitted_date = models.DateTimeField(null=True)
-    score = models.DecimalField(max_digits=3, decimal_places=2, null=True)
+    score = models.DecimalField(max_digits=5, decimal_places=2, null=True)
     file = models.CharField(max_length=64, null=True)
 
 class CourseQuiz(models.Model):
@@ -71,7 +71,7 @@ class CourseQuiz(models.Model):
     course_batch = models.ForeignKey(CourseBatch, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     duration = models.IntegerField(default=10)
-    minimum_score = models.DecimalField(max_digits=3, decimal_places=2, null=True)
+    minimum_score = models.DecimalField(max_digits=5, decimal_places=2, null=True)
     Accessibility = models.CharField(
         max_length=2, 
         choices=Accessibility.choices,
@@ -87,6 +87,7 @@ class CourseQuiz(models.Model):
 
 class QuizQuestion(models.Model):
     id = models.AutoField(primary_key=True)
+    course_quiz = models.ForeignKey(CourseQuiz, on_delete=models.CASCADE)
     question = models.TextField()
     ordering = models.IntegerField()
 
@@ -100,7 +101,7 @@ class QuizUser(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     quiz = models.ForeignKey(CourseQuiz, on_delete=models.CASCADE)
-    score = models.DecimalField(max_digits=3, decimal_places=2, null=True)
+    score = models.DecimalField(max_digits=5, decimal_places=2, null=True)
     correct_answer = models.IntegerField(null=True)
     question_order = models.TextField()
     target_time = models.DateTimeField()
