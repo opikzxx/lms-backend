@@ -1,9 +1,18 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
+from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework import status
+from django.contrib.auth import get_user_model
+from django.utils.decorators import method_decorator
+
+from lms.wrapper import validate_enrollment
 from .models import *
+from authentication.models import User
 from .serializers import *
+
+from datetime import datetime
+from django.db.models import Avg
 
 from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
@@ -17,31 +26,27 @@ class DashboardOverviewApiView(APIView):
         user = request.user
         enrollments = Enrollment.objects.filter(user=user)
 
-        course_batch_ids = [enrollment.course_batch for enrollment in enrollments]
-        course_batchs = CourseBatch.objects.filter(id__in=course_batch_ids).order_by('-close_date')[:4]
-        course = CourseBatchModelSerializer(course_batchs, many=True)
+        course_batch_ids = [enrollment.course_batch.id for enrollment in enrollments]
+        course_batchs = CourseBatch.objects.filter(id__in=course_batch_ids).order_by('end_date')[:4]
+        courses = CourseBatchModelSerializer(course_batchs, many=True)
 
-        # get assignments for the user
         course_assignments = CourseAssignment.objects.filter(course_batch__in=course_batch_ids).order_by('deadline')
         course_assignment_ids = [course_assignment.id for course_assignment in course_assignments]
         
-        user_assignments = AssignmentAttachment.objects.filter(user=user, assignment__in=course_assignment_ids, status='BS').order_by('assignment__deadline')
+        user_assignments = AssignmentAttachment.objects.filter(user=user, assignment__in=course_assignment_ids, status='BS').order_by('assignment__deadline')[:2]
         assignment = UserAssignmentModelSerializer(user_assignments, many=True)
 
         course_quizs = CourseQuiz.objects.filter(course_batch__in=course_batch_ids).order_by('deadline')
-        course_quiz_not_finished = course_quizs.objects.exclude(quizuser__user=user)[:2]
-        quiz = CourseQuizForList(course_quiz_not_finished, many=True)
-        # course_quiz_ids = [course_quiz.id for course_quiz in course_quizs]
+        course_quiz_not_finished = course_quizs.exclude(quizuser__user=user)[:2]
+        quiz = CourseQuizModelSerializer(course_quiz_not_finished, many=True)
 
-        # user_quizs = QuizUser.objects.filter(user=user, quiz__in=course_quiz_ids)
-
-        last_access = LastAccess.objects.filter(user=user, course_batch__in=course_batch_ids).order_by('-last_access').first()
+        last_access = LastAccess.objects.filter(user=user)
 
         data = {
-            course : course,
-            assignment : assignment,
-            quiz : quiz,
-            last_access : last_access
+            'enrollment_list' : courses.data,
+            'assignment_list' : assignment.data,
+            'quiz_list' : quiz.data,
+            'last_access' : last_access.course_batch.id if last_access else None
         }
         return Response(response(200, "success", data), status=status.HTTP_200_OK)
 
@@ -49,21 +54,22 @@ class DashboardOverviewApiView(APIView):
 class DashboardEnrolledCourseApiView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, program,  **kwargs):
+    def get(self, request, **kwargs):
         user = request.user
-
         enrollments = Enrollment.objects.filter(user=user)
 
-        course_batch_ids = [enrollment.course_batch for enrollment in enrollments]
+        course_batch_ids = [enrollment.course_batch.id for enrollment in enrollments]
         course_batchs = CourseBatch.objects.filter(id__in=course_batch_ids)
 
-        if program:
-            course_batchs = course_batchs.filter(course__program__name=program)
+        program = request.GET.get('program')
 
-        course_batchs = CourseBatchModelSerializer(course_batchs, many=True)
+        if program:
+            course_batchs = course_batchs.filter(course__program__slug=program)
+
+        courses = CourseBatchModelSerializer(course_batchs, many=True)
 
         data = {
-            course_batchs : course_batchs
+            'enrollment_list' : courses.data
         }
         return Response(response(200, "success", data), status=status.HTTP_200_OK)
 
@@ -74,8 +80,27 @@ class DashboardNotificationListApiView(APIView):
     def get(self, request, **kwargs):
         user = request.user
         enrollments = Enrollment.objects.filter(user=user)
-        course_batch_ids = [enrollment.course_batch for enrollment in enrollments]
-        pass
+        course_batch_ids = [enrollment.course_batch.id for enrollment in enrollments]
+        
+        # ambil data dari assignment_attachment, course_quiz, course_session
+        course_assignments = CourseAssignment.objects.filter(course_batch__in=course_batch_ids).order_by('deadline')
+        course_assignment_ids = [course_assignment.id for course_assignment in course_assignments]
+        
+        user_assignments = AssignmentAttachment.objects.filter(user=user, assignment__in=course_assignment_ids, status='RV').order_by('assignment__deadline')
+        assignment = UserAssignmentModelSerializer(user_assignments, many=True)
+
+        course_quiz = CourseQuiz.objects.filter(Q(course_batch__in=course_batch_ids), Q(deadline__gt=datetime.now()))
+        quiz = CourseQuizModelSerializer(course_quiz, many=True)
+
+        course_session = CourseSession.objects.filter(Q(course_batch__in=course_batch_ids), Q(time__gt=datetime.now()))
+        session = CourseSessionModelSerializer(course_session, many=True)
+
+        data = {
+            'assignment_list': assignment.data,
+            'quiz_list': quiz.data,
+            'session_list': session.data
+        }
+        return Response(response(200, "success", data), status=status.HTTP_200_OK)
 
 # Nampilin semua tugas si user
 class DashboardAssignmentListApiView(APIView):
@@ -85,7 +110,7 @@ class DashboardAssignmentListApiView(APIView):
         user = request.user
         enrollments = Enrollment.objects.filter(user=user)
 
-        course_batch_ids = [enrollment.course_batch for enrollment in enrollments]
+        course_batch_ids = [enrollment.course_batch.id for enrollment in enrollments]
 
         course_assignments = CourseAssignment.objects.filter(course_batch__in=course_batch_ids).order_by('deadline')
         course_assignment_ids = [course_assignment.id for course_assignment in course_assignments]
@@ -94,7 +119,7 @@ class DashboardAssignmentListApiView(APIView):
         assignment = UserAssignmentModelSerializer(user_assignments, many=True)
 
         data = {
-            assignment : assignment
+            'assignment_list': assignment.data
         }
         return Response(response(200, "success", data), status=status.HTTP_200_OK)
 
@@ -106,14 +131,14 @@ class DashboardQuizListApiView(APIView):
         user = request.user
         enrollments = Enrollment.objects.filter(user=user)
 
-        course_batch_ids = [enrollment.course_batch for enrollment in enrollments]
+        course_batch_ids = [enrollment.course_batch.id for enrollment in enrollments]
 
         course_quizs = CourseQuiz.objects.filter(course_batch__in=course_batch_ids).order_by('deadline')
-        course_quiz_not_finished = course_quizs.objects.exclude(quizuser__user=user)
-        quiz = CourseQuizForList(course_quiz_not_finished, many=True)
+        course_quiz_not_finished = course_quizs.exclude(quizuser__user=user)
+        quiz = CourseQuizModelSerializer(course_quiz_not_finished, many=True)
 
         data = {
-            quiz : quiz
+            'quiz_list': quiz.data
         }
         return Response(response(200, "success", data), status=status.HTTP_200_OK)
 
@@ -129,36 +154,105 @@ class DashboardEditProfileApiView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, **kwargs):
-        pass
+        user = request.user
+        
+        User = get_user_model()
+        data = User.objects.filter(email=user.email)
+        return Response(response(200, "success", data), status=status.HTTP_200_OK)
+
+    def put(self, request, **kwargs):
+        user = request.user
+        body = request.body
+        
+        User = get_user_model()
+        data = User.objects.filter(email=user.email).update(**body)
+        return Response(response(200, "success", data), status=status.HTTP_200_OK)
 
 # ------------------Detail Enrolled Course------------------
 
 # Nampilin ringkasan pengerjaan user di course itu
 class UserAccomplishmenOverviewApiView(APIView):
-    def get(self, request, **kwargs):
-        pass
+    permission_classes = [IsAuthenticated]
+
+    @method_decorator(validate_enrollment())
+    def get(self, request, batch_id, enrollment, **kwargs):
+        user = request.user
+        course_batch = CourseBatch.objects.get(id=batch_id)
+        AssignmentAttachment.objects.filter()
+
+        course_assignments = CourseAssignment.objects.filter(course_batch=course_batch)
+        course_assignment_ids = [course_assignment.id for course_assignment in course_assignments]
+        
+        count_finished_assignments = AssignmentAttachment.objects.filter(user=user, assignment__in=course_assignment_ids, status='SL').count()
+        average_grade_assignments = AssignmentAttachment.objects.filter(user=user, assignment__in=course_assignment_ids, status='SL').aggregate(Avg('score'))['score__avg']
+
+        data = {
+            'count_finished_assignments': count_finished_assignments,
+            'average_grade_assignments': average_grade_assignments
+        }
+        return Response(response(200, "success", data), status=status.HTTP_200_OK)
 
 # Bikin get & post rating si user
 class UserCourseRatingApiView(APIView):
-    def get(self, request, **kwargs):
-        pass
+    permission_classes = [IsAuthenticated]
+    
+    @method_decorator(validate_enrollment())
+    def get(self, request, batch_id, enrollment, **kwargs):
+        rating = UserRatingSerializer(enrollment)
+
+        data = {
+            'user_rating' : rating.data
+        }
+        return Response(response(200, "success", data), status=status.HTTP_200_OK)
         
 class UserOnlineSessionListApiView(APIView):
-    def get(self, request, **kwargs):
-        pass
+    permission_classes = [IsAuthenticated]
+
+    @method_decorator(validate_enrollment())
+    def get(self, request, batch_id, **kwargs):
+        course_sessions = CourseSession.objects.filter(course_batch__id=batch_id).order_by('ordering')
+
+        course_sessions_serializer = CourseSessionModelSerializer(course_sessions, many=True)
+
+        data = {
+            'online_session' : course_sessions_serializer.data
+        }
+        return Response(response(200, "success", data), status=status.HTTP_200_OK)
 
 class UserAssignmentListApiView(APIView):
-    def get(self, request, **kwargs):
-        pass
+    permission_classes = [IsAuthenticated]
+    @method_decorator(validate_enrollment())
+    def get(self, request, batch_id, **kwargs):
+        course_assignments = CourseAssignment.objects.filter(course_batch__id=batch_id).order_by('ordering')
+        course_assignment_ids = [assignment.id for assignment in course_assignments]
+        assignment_attachment = AssignmentAttachment.objects.filter(assignment__id__in=course_assignment_ids)
+
+        user_assignments_serializer = UserAssignmentModelSerializer(assignment_attachment, many=True)
+
+        data = {
+            'user_assignments' : user_assignments_serializer.data
+        }
+        return Response(response(200, "success", data), status=status.HTTP_200_OK)
 
 class UserQuizListApiView(APIView):
-    def get(self, request, **kwargs):
-        pass
+    permission_classes = [IsAuthenticated]
+    @method_decorator(validate_enrollment())
+    def get(self, request, batch_id, **kwargs):
+        course_quizzes = CourseQuiz.objects.filter(course_batch__id=batch_id).order_by('ordering')
+        course_quiz_ids = [course_quiz.id for course_quiz in course_quizzes]
+        user_quizzes = QuizUser.objects.filter(quiz__id__in=course_quiz_ids)
+
+        user_quizzes_serializer = QuizUserModelSerializer(user_quizzes, many=True)
+        
+        data = {
+            'user_quizzes' : user_quizzes_serializer.data
+        }
+        return Response(response(200, "success", data), status=status.HTTP_200_OK)
 
 # ------------------Api yang dibutuhin di tugas ------------------
 
 # Liat, submit, ama replace tugas
-class UserAssignmentApiView(APIView):
+class UserAssignmentAttachmentApiView(APIView):
     def get(self, request, **kwargs):
         pass
 

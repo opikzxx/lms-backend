@@ -18,9 +18,9 @@ class Enrollment(models.Model):
         default=EnrollmentType.BELAJAR,
     )
     rating = models.IntegerField(null=True)
-    ratingDetail = models.TextField(null=True)
-    finalScore = models.DecimalField(max_digits=5, decimal_places=2, null=True)
-    certificateUrl = models.CharField(max_length=255, null=True)
+    rating_detail = models.TextField(null=True)
+    final_score = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    certificate_url = models.CharField(max_length=255, null=True)
 
 class CourseAssignment(models.Model):
     class Accessibility(models.TextChoices):
@@ -72,7 +72,7 @@ class CourseQuiz(models.Model):
     title = models.CharField(max_length=255)
     duration = models.IntegerField(default=10)
     minimum_score = models.DecimalField(max_digits=5, decimal_places=2, null=True)
-    Accessibility = models.CharField(
+    accessibility = models.CharField(
         max_length=2, 
         choices=Accessibility.choices,
         default=Accessibility.OPEN

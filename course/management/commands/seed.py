@@ -172,6 +172,35 @@ def create_courses_price(courses):
         "BL", "SR"
     ]
 
+    benefits= {
+            "content": [
+                {
+                    "title": "lorem ipsum",
+                    "detail": True
+                },
+                {
+                    "title": "lorem ipsum",
+                    "detail": True
+                },
+                {
+                    "title": "lorem ipsum",
+                    "detail": True
+                },
+                {
+                    "title": "lorem ipsum",
+                    "detail": True
+                },
+                {
+                    "title": "lorem ipsum",
+                    "detail": False
+                },
+                {
+                    "title": "lorem ipsum",
+                    "detail": False
+                }
+            ]
+        }
+
     for i in range(5):
         course = CoursePrice.objects.create(
             course_id=courses[i],
@@ -179,6 +208,8 @@ def create_courses_price(courses):
             original_price=1000,
             discounted_price=100,
             discount_percentage=90,
+            description="Ini deskripsinya",
+            benefits=benefits
         )
         courses.append(course)
         print("{} price created.".format(course))
@@ -389,7 +420,7 @@ def create_course_quiz(course_batchs):
             title=f'quiz {i}',
             duration=10,
             minimum_score=Decimal('50.00'),
-            Accessibility=random.choice(accesibilities),
+            accessibility=random.choice(accesibilities),
             status=random.choice(status),
             ordering=i,
             deadline=date(2020, 12, 31),
@@ -455,7 +486,7 @@ def run_seed(self, mode):
     user = User.objects.create(
         email='tito123@gmail.com',
         username='tito123',
-        password=make_password('password'),
+        password=make_password('tito123'),
         birth_date=date(2000, 11, 11),
         gender='L',
         account_type='PR',

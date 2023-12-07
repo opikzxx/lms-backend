@@ -98,9 +98,11 @@ class CoursePrice(models.Model):
 
     id = models.AutoField(primary_key=True,null=False)
     course_id = models.ForeignKey(Course, on_delete=models.CASCADE, null=False)
+    description = models.TextField(null=False)
     original_price = models.IntegerField(null=False)
     discounted_price = models.IntegerField(null=False)
     discount_percentage = models.IntegerField(null=False)
+    benefits = models.JSONField(null=False)
     type = models.CharField(
         max_length=2,
         choices=Type.choices,
