@@ -6,7 +6,7 @@ import datetime
 from datetime import date
 import random
 from decimal import Decimal
-
+from django.utils import timezone
 # from authentication.models import User
 from lms.models import *
 from course.models import *
@@ -465,7 +465,7 @@ def create_course_session(course_batchs):
         session = CourseSession.objects.create(
             course_batch=course_batchs[i],
             title=random.choice(dummy),
-            time=datetime.datetime.now(),
+            time=timezone.now(),
             ordering=1
         )
         sessions.append(session)
