@@ -37,7 +37,7 @@ class CourseAdmin(admin.ModelAdmin):
         CourseFaqInline,
         CoursePriceInline,
         ]
-    exclude = ['id','created_at','updated_at', 'image_url']
+    exclude = ['id','created_at','updated_at']
 
 class CourseContentAdmin(admin.ModelAdmin):
     exclude = ['id','created_at','updated_at']

@@ -368,7 +368,7 @@ def create_course_assignment(course_batchs):
             accesibility=random.choice(accessibilities),
             title='assignment ' + str(i),
             file=random.choice(dummy),
-            ordering=i,
+            ordering=i+1,
             deadline=date(2020, 12, 31),
         )
         course_assignments.append(assignment)
@@ -422,7 +422,7 @@ def create_course_quiz(course_batchs):
             minimum_score=Decimal('50.00'),
             accessibility=random.choice(accesibilities),
             status=random.choice(status),
-            ordering=i,
+            ordering=i+1,
             deadline=date(2020, 12, 31),
         )
         quizs.append(quiz)
@@ -432,7 +432,7 @@ def create_course_quiz(course_batchs):
             question = QuizQuestion.objects.create(
                 course_quiz=quiz,
                 question=random.choice(questions),
-                ordering=j
+                ordering=j+1
             )
 
             for k in range(4):

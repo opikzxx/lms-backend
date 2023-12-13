@@ -62,7 +62,7 @@ class Course(models.Model):
     )
     participant_amount = models.IntegerField(default=0)
     certified_participant_amount = models.IntegerField(default=0)
-    image_url = models.ImageField(upload_to='cms-xpert/course/', null=True)
+    image_url = models.ImageField(upload_to='eureka-xpert/images/', null=True)
     teacher = models.ManyToManyField(Teacher)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

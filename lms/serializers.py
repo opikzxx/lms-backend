@@ -75,5 +75,33 @@ class LastAccessModelSerializer(serializers.ModelSerializer):
         model = LastAccess
         fields = ["course_batch"]
 
+class QuizQuestionModelSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = QuizQuestion
+        fields = ["id", "question", "ordering"]
+
+class QuizOptionModelSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = QuizOption
+        fields = ["id", "value"]
+
+class QuizUserAnswerModelSerializer(serializers.ModelSerializer):
+    answer = QuizOptionModelSerializer()
+
+    class Meta:
+        model = QuizUserAnswer
+        fields = ["id", "answer"]
+
+# --------------------- DTO ---------------------
 class QuizDTO(serializers.Serializer):
-    id = serializers.IntegerField()
+    quiz_id = serializers.IntegerField()
+
+class QuizAnswerDTO(serializers.Serializer):
+    quiz_session_id = serializers.IntegerField()
+    question_id = serializers.IntegerField()
+    answer_id = serializers.IntegerField()
+
+class SubmitQuizDTO(serializers.Serializer):
+    quiz_session_id = serializers.IntegerField()
