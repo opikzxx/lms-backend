@@ -24,12 +24,13 @@ class CourseBatchModelSerializer(serializers.ModelSerializer):
         fields = ["batch_id", "batch_number", "course"]
 
 class CourseAssignmentModelSerializer(serializers.ModelSerializer):
+    course_batch = CourseBatchModelSerializer()
 
     class Meta:
         model = CourseAssignment
-        fields = ["id", "title", "deadline", "file", "accesibility"]
+        fields = ["id", "title", "deadline", "file", "accesibility", "course_batch"]
         
-class CourseQuizModelSerializer(serializers.ModelSerializer):
+class CardCourseQuizModelSerializer(serializers.ModelSerializer):
     course_batch = CourseBatchModelSerializer()
 
     class Meta:
@@ -51,10 +52,11 @@ class UserRatingSerializer(serializers.ModelSerializer):
         fields = ["rating", "rating_detail"]
 
 class CourseSessionModelSerializer(serializers.ModelSerializer):
+    course_batch = CourseBatchModelSerializer()
 
     class Meta:
         model = CourseSession
-        fields = ["title", "time", "meeting_link", "record_link", "lesson_link"]
+        fields = ["title", "time", "meeting_link", "record_link", "lesson_link", "course_batch"]
 
 class CourseQuizModelSerializer(serializers.ModelSerializer):
 

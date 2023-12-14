@@ -12,6 +12,7 @@ urlpatterns = [
     path('batch/<str:id>', CourseBatchApiView.as_view(), name='course-batch'),
     path('schedule/<str:id>', CourseScheduleApiView.as_view(), name='course-schedule'),
     path('testimony', ListTestimonyApiView.as_view(), name='all-testimony'),
+    path('testimony/<str:id>', CourseTestimonyApiView.as_view(), name='course-testimony'),
     path('<str:id>', CourseOverviewApiView.as_view(), name='course-overview'),
 ]
 

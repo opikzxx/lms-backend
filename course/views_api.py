@@ -136,7 +136,12 @@ class TeacherDetailApiView(APIView):
 
 class ListTestimonyApiView(APIView):
     def get(self, request, **kwargs):
-        limit = request.GET.get('limit')
-        testimony = Testimony.objects.all()[:limit]
+        testimony = Testimony.objects.all()
+        serializer = TestimonyModelSerializer(testimony, many=True)
+        return Response(response(200, "success", serializer.data), status=status.HTTP_200_OK)
+    
+class CourseTestimonyApiView(APIView):
+    def get(self, request, id, **kwargs):
+        testimony = Testimony.objects.filter(course__id=id)
         serializer = TestimonyModelSerializer(testimony, many=True)
         return Response(response(200, "success", serializer.data), status=status.HTTP_200_OK)

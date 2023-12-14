@@ -45,7 +45,7 @@ class DashboardOverviewApiView(APIView):
 
         course_quizs = CourseQuiz.objects.filter(course_batch__in=course_batch_ids).order_by('deadline')
         course_quiz_not_finished = course_quizs.exclude(quizuser__user=user)[:2]
-        quiz = CourseQuizModelSerializer(course_quiz_not_finished, many=True)
+        quiz = CardCourseQuizModelSerializer(course_quiz_not_finished, many=True)
 
         last_access = LastAccess.objects.filter(user=user)
 
@@ -97,7 +97,7 @@ class DashboardNotificationListApiView(APIView):
         assignment = UserAssignmentModelSerializer(user_assignments, many=True)
 
         course_quiz = CourseQuiz.objects.filter(Q(course_batch__in=course_batch_ids), Q(deadline__gt=timezone.now()))
-        quiz = CourseQuizModelSerializer(course_quiz, many=True)
+        quiz = CardCourseQuizModelSerializer(course_quiz, many=True)
 
         course_session = CourseSession.objects.filter(Q(course_batch__in=course_batch_ids), Q(time__gt=timezone.now()))
         session = CourseSessionModelSerializer(course_session, many=True)
@@ -142,7 +142,7 @@ class DashboardQuizListApiView(APIView):
 
         course_quizs = CourseQuiz.objects.filter(course_batch__in=course_batch_ids).order_by('deadline')
         course_quiz_not_finished = course_quizs.exclude(quizuser__user=user)
-        quiz = CourseQuizModelSerializer(course_quiz_not_finished, many=True)
+        quiz = CardCourseQuizModelSerializer(course_quiz_not_finished, many=True)
 
         data = {
             'quiz_list': quiz.data
