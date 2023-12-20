@@ -47,13 +47,28 @@ class DashboardOverviewApiView(APIView):
         course_quiz_not_finished = course_quizs.exclude(quizuser__user=user)[:2]
         quiz = CardCourseQuizModelSerializer(course_quiz_not_finished, many=True)
 
-        last_access = LastAccess.objects.filter(user=user)
+        last_access_object = LastAccess.objects.filter(user=user)
+        if last_access_object:
+            last_access = CourseBatchModelSerializer(last_access_object.first().course_batch).data
+        else:
+            last_access = None
 
         data = {
             'enrollment_list' : courses.data,
             'assignment_list' : assignment.data,
             'quiz_list' : quiz.data,
-            'last_access' : last_access.course_batch.id if last_access else None
+            'last_access' : last_access
+        }
+        return Response(response(200, "success", data), status=status.HTTP_200_OK)
+    
+# Nampilin informasi course
+class DashboardCourseInfoApiView(APIView):
+    def get(self, request, batch_id, **kwargs):
+        course_batch = CourseBatch.objects.get(id=batch_id)
+        course = CourseBatchModelSerializer(course_batch)
+
+        data = {
+            'course_info' : course.data
         }
         return Response(response(200, "success", data), status=status.HTTP_200_OK)
 
@@ -238,13 +253,24 @@ class UserAssignmentListApiView(APIView):
     def get(self, request, batch_id, **kwargs):
         course_assignments = CourseAssignment.objects.filter(course_batch__id=batch_id).order_by('ordering')
         course_assignment_ids = [assignment.id for assignment in course_assignments]
-        assignment_attachment = AssignmentAttachment.objects.filter(assignment__id__in=course_assignment_ids)
-
-        user_assignments_serializer = UserAssignmentModelSerializer(assignment_attachment, many=True)
-
+        
         data = {
-            'user_assignments' : user_assignments_serializer.data
+            "assignments": []
         }
+
+        for id in course_assignment_ids:
+            course_assignment = CourseAssignment.objects.get(id=id)
+            course_assignment_serializer = CourseAssignmentModelSerializer(course_assignment)
+
+            assignment_attachment = AssignmentAttachment.objects.filter(assignment__id=id, user=request.user)
+            user_assignments_serializer = SimpleUserAssignmentModelSerializer(assignment_attachment, many=True)
+
+            assignment_data = {
+                "assignment_info": course_assignment_serializer.data,
+                "user_assignment": user_assignments_serializer.data
+            }
+            data["assignments"].append(assignment_data)
+
         return Response(response(200, "success", data), status=status.HTTP_200_OK)
 
 class UserQuizListApiView(APIView):
@@ -253,13 +279,24 @@ class UserQuizListApiView(APIView):
     def get(self, request, batch_id, **kwargs):
         course_quizzes = CourseQuiz.objects.filter(course_batch__id=batch_id).order_by('ordering')
         course_quiz_ids = [course_quiz.id for course_quiz in course_quizzes]
-        user_quizzes = QuizUser.objects.filter(quiz__id__in=course_quiz_ids)
 
-        user_quizzes_serializer = QuizUserModelSerializer(user_quizzes, many=True)
-        
         data = {
-            'user_quizzes' : user_quizzes_serializer.data
+            "quizzes": []
         }
+
+        for id in course_quiz_ids:
+            course_quiz = CourseQuiz.objects.get(id=id)
+            course_quiz_serializer = CourseQuizModelSerializer(course_quiz)
+
+            quiz_user = QuizUser.objects.filter(quiz__id=id, user=request.user)
+            user_quizzes_serializer = QuizUserModelSerializer(quiz_user, many=True)
+
+            quiz_data = {
+                "quiz_info": course_quiz_serializer.data,
+                "user_attempt": user_quizzes_serializer.data
+            }
+            data["quizzes"].append(quiz_data)
+
         return Response(response(200, "success", data), status=status.HTTP_200_OK)
 
 # ------------------Api yang dibutuhin di tugas ------------------
@@ -392,7 +429,11 @@ class FinishQuizApiView(APIView):
                     correct_answer += 1
 
             quiz_user.correct_answer = correct_answer
-            quiz_user.score = Decimal(str(correct_answer * 10) + ".00")
+            score = Decimal(str(correct_answer * 10) + ".00")
+            quiz_user.score = score
+
+            if score < quiz_user.quiz.minimum_score:
+                quiz_user.is_remedial = True
 
             quiz_user.save()
 
@@ -403,3 +444,45 @@ class FinishQuizApiView(APIView):
 class UserQuizReviewApiView(APIView):
     def get(self, request, **kwargs):
         pass
+
+class LastAccessApiView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, **kwargs):
+        user = request.user
+        last_access = LastAccess.objects.filter(user=user).first()
+        if last_access:
+            course_batch = last_access.course_batch
+            course_batch_serializer = CourseBatchModelSerializer(course_batch)
+            return Response(response(200, "success", course_batch_serializer.data), status=status.HTTP_200_OK)
+        
+        return Response(response(200, "success", None), status=status.HTTP_200_OK)
+
+    @method_decorator(validate_serializer(LastAccessDTO))
+    def post(self, request, data, **kwargs):
+        user = request.user
+
+        course_batch = CourseBatch.objects.get(id=data['batch_id'])
+        last_access, created = LastAccess.objects.get_or_create(user=user)
+        last_access.course_batch = course_batch
+        last_access.last_access = timezone.now()
+        last_access.save()
+
+        return Response(response(200, "success", None), status=status.HTTP_200_OK)
+    
+class EnrollApiView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @method_decorator(validate_serializer(EnrollDTO))
+    def post(self, request, data, **kwargs):
+        user = request.user
+
+        course_batch = CourseBatch.objects.get(id=data['batch_id'])
+
+        Enrollment.objects.create(
+            course_batch=course_batch,
+            user=user,
+            enrollment_type="BL",
+        )
+
+        return Response(response(200, "success", None), status=status.HTTP_200_OK)

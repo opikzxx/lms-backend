@@ -21,7 +21,7 @@ class CourseBatchModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CourseBatch
-        fields = ["batch_id", "batch_number", "course"]
+        fields = ["batch_id", "batch_number", "start_date", "end_date", "course"]
 
 class CourseAssignmentModelSerializer(serializers.ModelSerializer):
     course_batch = CourseBatchModelSerializer()
@@ -36,6 +36,16 @@ class CardCourseQuizModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseQuiz
         fields = ["id", "title", "course_batch"]
+
+class SimpleUserAssignmentModelSerializer(serializers.ModelSerializer):
+    status = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = AssignmentAttachment
+        fields = ["id", "status", "score", "submitted_date", "feedback", "file"]
+
+    def get_status(self, obj):
+        return obj.get_status_display()
 
 class UserAssignmentModelSerializer(serializers.ModelSerializer):
     assignment = CourseAssignmentModelSerializer()
@@ -65,10 +75,10 @@ class CourseQuizModelSerializer(serializers.ModelSerializer):
         fields = ["id","title", "duration", "minimum_score", "accessibility", "status", "deadline"]
 
 class QuizUserModelSerializer(serializers.ModelSerializer):
-    quiz = CourseQuizModelSerializer()
+    # quiz = CourseQuizModelSerializer()
     class Meta:
         model = QuizUser
-        fields = ["id", "quiz","score", "correct_answer", "question_order", "target_time", "completion_time", "is_remedial", "attemp"]
+        fields = ["id", "score", "correct_answer", "question_order", "target_time", "completion_time", "is_remedial", "attempt"]
 
 class LastAccessModelSerializer(serializers.ModelSerializer):
     course_batch = CourseBatchModelSerializer()
@@ -107,3 +117,9 @@ class QuizAnswerDTO(serializers.Serializer):
 
 class SubmitQuizDTO(serializers.Serializer):
     quiz_session_id = serializers.IntegerField()
+
+class LastAccessDTO(serializers.Serializer):
+    batch_id = serializers.IntegerField()
+
+class EnrollDTO(serializers.Serializer):
+    batch_id = serializers.IntegerField()
